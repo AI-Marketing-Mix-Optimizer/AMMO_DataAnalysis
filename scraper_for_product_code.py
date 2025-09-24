@@ -131,8 +131,8 @@ def main():
     code_index = 1  # 코드 인덱스 1부터 시작
 
     # 각 쇼핑라이브 크롤링
-    for url in broadcast_urls:
-        print(f"크롤링 시작: {url}")
+    for i, url in enumerate(broadcast_urls):
+        print(f"[{i+1}/{len(broadcast_urls)}] 크롤링 시작: {url}")
         scraper = LiveProductScraper(driver_path, url)  # LiveProductScraper 객체
         scraper.load_page()
         scraper.click_show_all()
@@ -152,7 +152,7 @@ def main():
 
 
     # CSV 저장
-    with open("all_products.csv", "w", newline="", encoding="utf-8") as f:
+    with open("all_products.csv", "w", newline="", encoding="utf-8-sig") as f:
         writer = csv.writer(f)
         writer.writerow(["prod_code", "prod_name", "prod_url"])
         writer.writerows(all_results)
