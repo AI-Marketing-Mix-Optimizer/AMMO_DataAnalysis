@@ -14,13 +14,13 @@ from selenium.webdriver.support import expected_conditions as EC
 # [사용자 설정 영역]
 # =====================================================================================
 
-# 1. 다시보기 영상 목록이 있는 '채널' 페이지의 URL을 입력하세요.
+# 다시보기 영상 목록 채널 페이지의 URL
 CHANNEL_URL = "https://shoppinglive.naver.com/search/lives?query=%EB%9D%BD%ED%86%A0%ED%95%8F%20%EC%9C%A0%EC%82%B0%EA%B7%A0&sort=RECENT"
 
-# 2. 몇 초 단위로 시간을 점프할지 설정합니다. (단위: 초)
+# 시간 점프 설정 (초)
 JUMP_INTERVAL_SECONDS = 300  # 300초 = 5분
 
-# 3. 시간 점프 후, 댓글이 로드될 때까지 몇 초 기다릴지 설정합니다.
+# 댓글 로드될 때까지 설정.
 POST_JUMP_WAIT_SECONDS = 2
 
 # =====================================================================================
@@ -28,8 +28,7 @@ POST_JUMP_WAIT_SECONDS = 2
 # =====================================================================================
 
 def setup_driver():
-    """크롬 드라이버를 설정하고 실행합니다."""
-    print("크롬 드라이버를 설정합니다...")
+    print("크롬 드라이버를 설정...")
     options = webdriver.ChromeOptions()
     # options.add_argument('--headless')  # 백그라운드 실행을 원할 경우 주석 해제
     options.add_argument('--log-level=3')
@@ -45,8 +44,7 @@ def setup_driver():
         return None
 
 def get_replay_links(driver, channel_url):
-    """채널 페이지에서 HTML에 표시된 순서대로 모든 '다시보기' 영상의 URL을 수집합니다."""
-    print(f"\n'{channel_url}' 채널 페이지로 이동하여 다시보기 링크를 수집합니다.")
+    print(f"\n'{channel_url}' 채널 페이지로 이동하여 다시보기 링크를 수집")
     driver.get(channel_url)
     time.sleep(3)
 
@@ -54,13 +52,13 @@ def get_replay_links(driver, channel_url):
     seen_links = set()    # 중복 확인을 위해 set 사용
     last_height = driver.execute_script("return document.body.scrollHeight")
 
-    print("페이지를 아래로 스크롤하여 모든 영상 링크를 로드합니다...")
+    print("페이지를 아래로 스크롤하여 모든 영상 링크를 로드...")
     while True:
-        # '/replays/'가 포함된 <a> 태그(다시보기 링크)를 찾습니다.
+        # '/replays/'가 포함된 <a> 태그(다시보기 링크)를 찾음
         replay_elements = driver.find_elements(By.CSS_SELECTOR, "a[href*='/replays/']")
         for elem in replay_elements:
             link = elem.get_attribute('href')
-            # 아직 추가되지 않은 링크만 순서대로 리스트에 추가합니다.
+            # 아직 추가되지 않은 링크만 순서대로 리스트에 추가
             if link and link not in seen_links:
                 ordered_links.append(link)
                 seen_links.add(link)
@@ -72,12 +70,12 @@ def get_replay_links(driver, channel_url):
             break
         last_height = new_height
 
-    print(f"✓ 총 {len(ordered_links)}개의 다시보기 영상 링크를 찾았습니다.")
+    print(f"✓ 총 {len(ordered_links)}개의 다시보기 영상 링크를 찾음")
 
     # 수집된 URL 목록을 순서대로 출력
     print("\n--- 수집된 URL 목록 (처리 순서) ---")
     if not ordered_links:
-        print("수집된 URL이 없습니다.")
+        print("수집된 URL이 없음")
     else:
         for idx, link in enumerate(ordered_links, 1):
             print(f"{idx}. {link}")
@@ -86,7 +84,7 @@ def get_replay_links(driver, channel_url):
     return ordered_links
 
 def get_video_duration(driver):
-    """비디오의 전체 길이를 초 단위로 가져옵니다."""
+    """비디오의 전체 길이를 가져옴 (초)."""
     try:
         # video 태그가 로드될 때까지 최대 10초 대기
         WebDriverWait(driver, 10).until(
@@ -98,11 +96,11 @@ def get_video_duration(driver):
             return duration
         return None
     except (JavascriptException, TimeoutException):
-        print("  - 영상 길이를 찾는 데 실패했습니다.")
+        print("  - 영상 길이를 찾는 데 실패했음.")
         return None
 
 def jump_to_time(driver, seconds):
-    """비디오를 특정 시간으로 이동시킵니다."""
+    """비디오를 특정 시간으로 이동"""
     try:
         driver.execute_script(f"document.querySelector('video').currentTime = {seconds};")
         return seconds
@@ -110,7 +108,7 @@ def jump_to_time(driver, seconds):
         return None
 
 def scrape_comments_from_video(driver, video_url):
-    """하나의 영상 URL에 접속하여 시간대별 댓글을 모두 수집합니다."""
+    """하나의 영상 URL에 접속하여 시간대별 댓글을 모두 수집"""
     driver.get(video_url)
     print("\n----------------------------------------------------")
     print(f"영상 URL: {video_url}")
@@ -157,11 +155,11 @@ def scrape_comments_from_video(driver, video_url):
     return video_comments
 
 def append_to_csv(filename, data):
-    """수집된 댓글 데이터를 CSV 파일에 이어서 저장합니다."""
+    """수집된 댓글 데이터를 CSV 파일에 이어서 저장"""
     if not data:
         return
 
-    # 파일이 없으면 새로 만들고 헤더를 쓰고, 있으면 이어서 씁니다.
+    # 파일이 없으면 새로 만들고 헤더를 쓰고, 있으면 이어서 씀
     file_exists = os.path.isfile(filename)
 
     try:
@@ -170,7 +168,7 @@ def append_to_csv(filename, data):
             writer = csv.DictWriter(f, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
 
             if not file_exists:
-                writer.writeheader()  # 파일이 새로 생성될 때만 헤더를 씁니다.
+                writer.writeheader()  # 파일이 새로 생성될 때만 헤더를 씀
 
             writer.writerows(data)
 
@@ -180,7 +178,7 @@ def append_to_csv(filename, data):
         print(f"✗ CSV 파일 저장 중 오류 발생: {e}")
 
 def get_channel_id_from_url(url):
-    """URL에서 채널 ID를 추출하여 파일 이름을 생성합니다."""
+    """URL에서 채널 ID를 추출하여 파일 이름을 생성"""
     match = re.search(r'/channels/(\d+)', url)
     return match.group(1) if match else "unknown_channel"
 
@@ -195,7 +193,7 @@ if __name__ == "__main__":
 
         # 스크립트를 새로 시작할 때, 이전 결과 파일이 있다면 삭제
         if os.path.exists(output_filename):
-            print(f"\n기존 '{output_filename}' 파일을 삭제하고 새로 시작합니다.")
+            print(f"\n기존 '{output_filename}' 파일을 삭제하고 새로 시작")
             os.remove(output_filename)
 
         try:
@@ -212,12 +210,12 @@ if __name__ == "__main__":
                     total_comments_count += len(comments)
 
             print(f"\n\n======= 최종 수집 완료 =======")
-            print(f"총 {len(replay_urls)}개 영상에서 {total_comments_count}개의 댓글을 수집하여 '{output_filename}'에 저장했습니다.")
+            print(f"총 {len(replay_urls)}개 영상에서 {total_comments_count}개의 댓글을 수집하여 '{output_filename}'에 저장했음")
 
         except Exception as e:
             print(f"\n! 크롤링 도중 예상치 못한 오류 발생: {e}")
 
         finally:
-            print("\n모든 작업을 종료하고 드라이버를 닫습니다.")
+            print("\n모든 작업을 종료하고 드라이버를 닫음")
             driver.quit()
 

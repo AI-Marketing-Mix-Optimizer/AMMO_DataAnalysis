@@ -13,10 +13,10 @@ from selenium.webdriver.support import expected_conditions as EC
 # 다시보기 영상 목록 채널 페이지의 URL
 CHANNEL_URL = "https://shoppinglive.naver.com/channels/51290/live?sort=LATEST"
 
-# 2. 시간 점프 설정 (초)
+# 시간 점프 설정 (초)
 JUMP_INTERVAL_SECONDS = 300
 
-# 3. 댓글 로드될 때까지 설정.
+# 댓글 로드될 때까지 설정.
 POST_JUMP_WAIT_SECONDS = 2
 
 # =====================================================================================
@@ -25,7 +25,7 @@ POST_JUMP_WAIT_SECONDS = 2
 
 def setup_driver():
 
-    print("크롬 드라이버를 설정합니다...")
+    print("크롬 드라이버를 설정...")
     options = webdriver.ChromeOptions()
     # options.add_argument('--headless')  # 백그라운드 실행을 원할 경우 주석 해제
     options.add_argument('--log-level=3')
@@ -207,7 +207,7 @@ if __name__ == "__main__":
                     total_comments_count += len(comments)
 
             print(f"\n\n======= 최종 수집 완료 =======")
-            print(f"총 {len(replay_urls)}개 영상에서 {total_comments_count}개의 댓글을 수집하여 '{output_filename}'에 저장했습니다.")
+            print(f"총 {len(replay_urls)}개 영상에서 {total_comments_count}개의 댓글을 수집하여 '{output_filename}'에 저장했음.")
 
         except Exception as e:
             print(f"\n! 크롤링 도중 예상치 못한 오류 발생: {e}")
