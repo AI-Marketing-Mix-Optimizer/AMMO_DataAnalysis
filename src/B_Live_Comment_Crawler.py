@@ -19,6 +19,9 @@ JUMP_INTERVAL_SECONDS = 300
 # 댓글 로드될 때까지 설정.
 POST_JUMP_WAIT_SECONDS = 2
 
+# 파일명
+OUTPUT_FILENAME = "B_Live_Comment.csv"
+
 # =====================================================================================
 # [메인 로직]
 # =====================================================================================
@@ -174,19 +177,13 @@ def append_to_csv(filename, data):
     except Exception as e:
         print(f"✗ CSV 파일 저장 중 오류 발생: {e}")
 
-def get_channel_id_from_url(url):
-    """URL에서 채널 ID를 추출하여 파일 이름을 생성."""
-    match = re.search(r'/channels/(\d+)', url)
-    return match.group(1) if match else "unknown_channel"
-
 
 if __name__ == "__main__":
     driver = setup_driver()
 
     if driver:
-        # 최종 저장 파일 이름 결정
-        channel_id = get_channel_id_from_url(CHANNEL_URL)
-        output_filename = f"B_comments_channel_{channel_id}.csv"
+        # 최종 파일명
+        output_filename = OUTPUT_FILENAME
 
         # 스크립트를 새로 시작할 때, 이전 결과 파일이 있다면 삭제
         if os.path.exists(output_filename):
