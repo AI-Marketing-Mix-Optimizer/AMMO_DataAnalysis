@@ -19,7 +19,7 @@ class LiveScraper:
     # 라이브 방송 페이지 로드
     def load_page(self):
         self.driver.get(self.url)
-        time.sleep(5)  # 페이지 로드 대기
+        time.sleep(3)  # 페이지 로드 대기
 
         # iframe 존재시 전환
         iframes = self.driver.find_elements(By.TAG_NAME, "iframe")
@@ -141,7 +141,7 @@ def main():
     }
 
     # 사용할 브랜드 (비에날씬, 덴마크, 락토핏)
-    brand = 'B'  # 'B', 'D', 'L' *********************************************************************************************************************************
+    brand = 'D'  # 'B', 'D', 'L' *********************************************************************************************************************************
     channel_url = brand_info[brand]['url']
     prod_prefix = brand_info[brand]['prod_prefix']
     live_prefix = brand_info[brand]['live_prefix']
@@ -170,10 +170,14 @@ def main():
 
         # 라이브 제목
         try:
-            live_name = driver.title.strip()  # 앞뒤 공백 제거
+            meta_tag = scraper.driver.find_element(By.CSS_SELECTOR, "meta[property='og:title']")
+            live_name = meta_tag.get_attribute("content").strip()
         except:
-            live_name = f"라이브_{i}"
-        live_code = f"{live_prefix}_{i:03d}"  # 라이브 코드
+            try:
+                live_name = scraper.driver.title.strip()
+            except:
+                live_name = f"라이브_{i + 1}"
+        live_code = f"{live_prefix}_{i+1:03d}"  # 라이브 코드
         live_results.append((live_code, live_name, url))
 
         products = scraper.extract_products()  # (name, url) 리스트
@@ -193,8 +197,8 @@ def main():
     # CSV 저장
     save_to_csv(live_results, f"라이브코드_{brand_name}.csv", ["live_code", "live_name", "live_url"])
     print(f"총 {len(live_results)}개의 라이브 CSV 저장 완료")
-    save_to_csv(prod_results, f"상품코드_{brand_name}.csv", ["prod_code", "prod_name", "prod_url"])
-    print(f"총 {len(prod_results)}개의 상품 CSV 저장 완료")
+    # save_to_csv(prod_results, f"상품코드_{brand_name}.csv", ["prod_code", "prod_name", "prod_url"])
+    # print(f"총 {len(prod_results)}개의 상품 CSV 저장 완료")
 
 
 if __name__ == "__main__":
