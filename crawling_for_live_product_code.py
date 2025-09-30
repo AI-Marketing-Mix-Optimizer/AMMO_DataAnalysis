@@ -197,9 +197,10 @@ def main():
     # CSV 저장
     save_to_csv(live_results, f"라이브코드_{brand_name}.csv", ["live_code", "live_name", "live_url"])
     print(f"총 {len(live_results)}개의 라이브 CSV 저장 완료")
-    # save_to_csv(prod_results, f"상품코드_{brand_name}.csv", ["prod_code", "prod_name", "prod_url"])
-    # print(f"총 {len(prod_results)}개의 상품 CSV 저장 완료")
+    save_to_csv(prod_results, f"상품코드_{brand_name}.csv", ["prod_code", "prod_name", "prod_url"])
+    print(f"총 {len(prod_results)}개의 상품 CSV 저장 완료")
 
 
 if __name__ == "__main__":
+
     main()
