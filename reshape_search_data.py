@@ -1,7 +1,7 @@
 import pandas as pd
 
 # 원본 CSV 읽기
-df = pd.read_csv(r"D:\School\5-2\데이터\네이버검색량.csv")  # D:\School\5-2\데이터\네이버검색량_유산균추가.csv
+df = pd.read_csv(r"D:\School\5-2\데이터\검색량_전체.csv")  # D:\School\5-2\데이터\네이버검색량_유산균추가.csv
 
 # 결과 저장용 리스트
 dfs = []
@@ -27,6 +27,7 @@ df_long["date"] = pd.to_datetime(df_long["date"])
 df_long = df_long[["brand", "search_volume", "date"]]
 
 # 저장
-df_long.to_csv(r"D:\School\5-2\데이터\네이버검색량_long.csv", index=False, encoding="utf-8-sig")
+df_long.to_csv(r"D:\School\5-2\데이터\search_volume_total.csv", index=False, encoding="utf-8-sig")
 
-print(df_long.head)
+print(df_long.head())
+
