@@ -6,7 +6,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from urllib.parse import urlparse, parse_qs, unquote
 import time
 import csv
-
+import html
+import json
 
 class LiveScraper:
     def __init__(self, driver_path, url):
@@ -60,22 +61,27 @@ class LiveScraper:
         items = self.driver.find_elements(By.CSS_SELECTOR, "div.ProductList_item_erjbw")
         for item in items:
             try:
-                link_tag = item.find_element(By.CSS_SELECTOR, "strong.ProductTitle_wrap_gGxmc a")
+                a_title = item.find_element(By.CSS_SELECTOR, "strong.ProductTitle_wrap_gGxmc a")
+                a_thumb = item.find_element(By.CSS_SELECTOR, "a.ProductThumbnail_link_thumbnail_779w7")
+
                 # 상품명
-                name = link_tag.text.strip()
+                name = a_title.text.strip()
 
-                # 브리지 URL (네이버 쇼핑라이브 중계용 주소)
-                raw_url = link_tag.get_attribute("href")
+                # sourceUrl 디코딩
+                raw_url = a_title.get_attribute("href")
+                qs = parse_qs(urlparse(raw_url).query)
+                prod_url = unquote(qs.get("sourceUrl", [raw_url])[0])
+                
+                # 상품 가격
+                data = a_thumb.get_attribute("data-shp-contents-dtl")
+                price = ""
+                if data:
+                    for d in json.loads(html.unescape(data)):
+                        if d.get("key") == "price":
+                            price = d.get("value")
+                            break
 
-                # raw_url 내 sourceUrl 디코딩 -> 실제 상품 url 복원
-                parsed = urlparse(raw_url)
-                qs = parse_qs(parsed.query)
-                if "sourceUrl" in qs:
-                    prod_url = unquote(qs["sourceUrl"][0])  # 디코딩된 실제 URL
-                else:
-                    prod_url = raw_url
-
-                self.results.append((name, prod_url))
+                self.results.append((name, prod_url, price))
 
             except:
                 # strong a 태그 없으면 건너뜀 (상품이 아님)
@@ -180,14 +186,14 @@ def main():
         live_code = f"{live_prefix}_{i+1:03d}"  # 라이브 코드
         live_results.append((live_code, live_name, url))
 
-        products = scraper.extract_products()  # (name, url) 리스트
+        products = scraper.extract_products()  # (name, url, price) 리스트
 
         # 중복 제외하고 prod_results에 추가
-        for name, prod_url in products:
+        for name, prod_url, price in products:
             if name not in existing_names:
                 # 상품 코드 BP_001, BP_002, ...
                 code = f"{prod_prefix}_{prod_index:03d}"
-                prod_results.append((code, name, prod_url))
+                prod_results.append((code, name, price, prod_url))
                 existing_names.add(name)  # 집합에 추가
                 prod_index += 1
 
@@ -197,10 +203,9 @@ def main():
     # CSV 저장
     save_to_csv(live_results, f"라이브코드_{brand_name}.csv", ["live_code", "live_name", "live_url"])
     print(f"총 {len(live_results)}개의 라이브 CSV 저장 완료")
-    save_to_csv(prod_results, f"상품코드_{brand_name}.csv", ["prod_code", "prod_name", "prod_url"])
+    save_to_csv(prod_results, f"상품코드_{brand_name}.csv", ["prod_code", "prod_name", "prod_price", "prod_url"])
     print(f"총 {len(prod_results)}개의 상품 CSV 저장 완료")
 
 
 if __name__ == "__main__":
-
     main()
