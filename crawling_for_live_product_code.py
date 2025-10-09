@@ -137,7 +137,7 @@ def save_to_csv(data, filename, headers=None, encoding="utf-8-sig"):
 
 
 def main():
-    driver_path = r'D:\School\5-2\edgedriver_win64\msedgedriver.exe'  # 드라이버 경로
+    driver_path = r'C:\Users\ilimo\Downloads\edgedriver_win64\msedgedriver.exe'  # 드라이버 경로
 
     # 브랜드 정보 딕셔너리
     brand_info = {
@@ -163,6 +163,7 @@ def main():
 
     live_results = []
     prod_results = []
+
     existing_names = set()  # 중복 상품 체크용 집합
     prod_index = 1  # 상품 코드 인덱스 1부터 시작
 
@@ -184,10 +185,11 @@ def main():
             except:
                 live_name = f"라이브_{i + 1}"
         live_code = f"{live_prefix}_{i+1:03d}"  # 라이브 코드
-        live_results.append((live_code, live_name, url))
 
+        # 상품 추출
         products = scraper.extract_products()  # (name, url, price) 리스트
 
+        live_prod_results = []  # 라이브와 상품 매칭을 위한 리스트
         # 중복 제외하고 prod_results에 추가
         for name, prod_url, price in products:
             if name not in existing_names:
@@ -196,14 +198,23 @@ def main():
                 prod_results.append((code, name, price, prod_url))
                 existing_names.add(name)  # 집합에 추가
                 prod_index += 1
+            else:
+                # 이미 있는 상품이면 prod_code 찾기
+                code = next(c for c, n, _, _ in prod_results if n == name)
+                
+            # 라이브 내 상품코드 기록
+            live_prod_results.append(code)
+
+        # 라이브 결과에 상품코드 추가
+        live_results.append((live_code, live_name, url, ",".join(live_prod_results)))
 
         scraper.quit()
         print(f"총 {len(products)}개의 상품 추출 완료")
 
     # CSV 저장
-    save_to_csv(live_results, f"라이브코드_{brand_name}.csv", ["live_code", "live_name", "live_url"])
+    save_to_csv(live_results, f"라이브코드_{brand_name}_2.csv", ["live_code", "live_name", "live_url", "prod_codes"])
     print(f"총 {len(live_results)}개의 라이브 CSV 저장 완료")
-    save_to_csv(prod_results, f"상품코드_{brand_name}.csv", ["prod_code", "prod_name", "prod_price", "prod_url"])
+    save_to_csv(prod_results, f"상품코드_{brand_name}_2.csv", ["prod_code", "prod_name", "prod_price", "prod_url"])
     print(f"총 {len(prod_results)}개의 상품 CSV 저장 완료")
 
 
