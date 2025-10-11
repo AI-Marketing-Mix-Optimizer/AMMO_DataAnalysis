@@ -33,6 +33,9 @@ actual_monthly_searches = 229475
 scaling_factor = actual_monthly_searches / total_relative_searches
 df["search_volume_abs"] = df["search_volume_relative"] * scaling_factor
 
+# 예상 광고비 계산
+df["ad_spend_est"] = df["search_volume_abs"] * df["cpc_pred"]
+
 # 수정된 데이터프레임 저장
 df.to_csv(r"D:\School\5-2\데이터\search_volume_data\search_volume_total.csv", index=False, encoding="utf-8-sig")
 
