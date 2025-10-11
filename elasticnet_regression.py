@@ -107,7 +107,7 @@ print(f"X_test shape: {X_test.shape}, y_test shape: {y_test.shape}")
 model = ElasticNet(alpha=1.0, l1_ratio=0.5, random_state=42)
 
 # 모델 학습
-print('ElasticNet model training start')
+print('\n- - ElasticNet model training start - -')
 model.fit(X_train, y_train)
 
 
@@ -131,6 +131,14 @@ results_df = pd.DataFrame({
     "rmse": rmse
 })
 
+print("\n=== Feature별 회귀 계수 ===")
+for i, f in enumerate(feature_names):
+    print(f"{f}: {coefficients[i]:,.2f}")
+
+print("\n=== 모델 전체 성능 ===")
+print(f"R²: {r2:.4f}")
+print(f"RMSE: {rmse:,.0f}")
+
 # CSV 저장
 results_df.to_csv(rf"{data_path}\elasticnet_results_{brand}.csv", index=False, encoding="utf-8-sig")
-print('ElasticNet model 결과 저장 완료')
+print('\nElasticNet model 결과 저장 완료')
