@@ -10,7 +10,7 @@ brand = 'B'  # 'B', 'D', 'L' ***************************************************
 ####################################
 ######        데이터 준비        #####
 ####################################
-data_path = r"D:\School\5-2\데이터"
+data_path = r"data"
 # CSV 불러오기
 live_df = pd.read_csv(rf"{data_path}\live_info_{brand}_2.csv")
 search_df = pd.read_csv(rf"{data_path}\search_volume_total.csv")
@@ -71,16 +71,17 @@ weekly_df = (
     .sum().reset_index()
 )
 
-# 경쟁사 이벤트 여부 0 이상이면 다 1로
-weekly_df["competitor_event_flag"] = (weekly_df["competitor_event_flag"] > 0).astype(int)
-
 # 주 시작일 계산
 weekly_df["week_start"] = start_date + pd.to_timedelta(weekly_df["week_index"] * 7, unit="D")
 weekly_df = weekly_df[["week_start", "live_ad_spend_est", "search_ad_spend_est", "competitor_event_flag", "proxy_sales"]]
 
+# 경쟁사 이벤트 여부 0 이상이면 다 1로
+weekly_df["competitor_event_flag"] = (weekly_df["competitor_event_flag"] > 0).astype(int)
+
 # 데이터 저장
-weekly_df.to_csv(rf"{data_path}\elasticnet_data_{brand}.csv", index=False, encoding="utf-8-sig")
-# print(weekly_df.head())
+merged_df.to_csv(rf"{data_path}\elasticnet_data_day_{brand}.csv", index=False, encoding="utf-8-sig")
+weekly_df.to_csv(rf"{data_path}\elasticnet_data_week_{brand}.csv", index=False, encoding="utf-8-sig")
+# print(merged_df.head())
 
 
 ########################################
@@ -89,6 +90,8 @@ weekly_df.to_csv(rf"{data_path}\elasticnet_data_{brand}.csv", index=False, encod
 # feature, label 분리
 X = weekly_df[["live_ad_spend_est", "search_ad_spend_est", "competitor_event_flag"]]
 y = weekly_df["proxy_sales"]
+# X = merged_df[["live_ad_spend_est", "search_ad_spend_est", "competitor_event_flag"]]
+# y = merged_df["proxy_sales"]
 
 # 데이터 스케일링 (ElasticNet은 스케일 민감)
 scaler = StandardScaler()
@@ -100,7 +103,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # 데이터 크기 확인
-print(f"X_train shape: {X_train.shape}, y_train shape: {y_train.shape}")
+print(f"\nX_train shape: {X_train.shape}, y_train shape: {y_train.shape}")
 print(f"X_test shape: {X_test.shape}, y_test shape: {y_test.shape}")
 
 # alpha: 정규화 강도, l1_ratio: L1(Lasso)/L2(Ridge) 비율
@@ -116,29 +119,32 @@ model.fit(X_train, y_train)
 ############################################
 feature_names = ["live_ad_spend_est", "search_ad_spend_est", "competitor_event_flag"]
 
-coefficients = model.coef_  # 회귀 계수
-y_pred = model.predict(X_test)  # 예측
+# 스케일링 된 계수를 원 단위로 복원
+beta_real = model.coef_ / scaler.scale_
+intercept_real = model.intercept_ - np.sum(scaler.mean_ * model.coef_ / scaler.scale_)
+
+# 계수와 절편 출력
+print("\n=== Feature별 회귀 계수 (원 단위) ===")
+for i, f in enumerate(feature_names):
+    print(f"{f}: {beta_real[i]:,.2f}")
+print(f"intercept: {intercept_real:,.2f}")
+
+# 예측
+y_pred = model.predict(X_test)
 
 # 전체 모델 성능
 r2 = r2_score(y_test, y_pred)
 rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 
-# 모델 성능 결과 df
-results_df = pd.DataFrame({
-    "feature": feature_names,
-    "beta": coefficients,
-    "r2": r2,
-    "rmse": rmse
-})
-
-print("\n=== Feature별 회귀 계수 ===")
-for i, f in enumerate(feature_names):
-    print(f"{f}: {coefficients[i]:,.2f}")
-
 print("\n=== 모델 전체 성능 ===")
 print(f"R²: {r2:.4f}")
 print(f"RMSE: {rmse:,.0f}")
 
-# CSV 저장
-results_df.to_csv(rf"{data_path}\elasticnet_results_{brand}.csv", index=False, encoding="utf-8-sig")
-print('\nElasticNet model 결과 저장 완료')
+# 결과를 DataFrame으로 저장
+results_df = pd.DataFrame({
+    "feature": feature_names + ["intercept", "R2", "RMSE"],
+    "beta_scaled": list(model.coef_) + [model.intercept_, np.nan, np.nan],
+    "beta_real": list(beta_real) + [intercept_real, r2, rmse]
+})
+
+results_df.to_csv(rf"elasticnet_results_week_{brand}_2.csv", index=False, encoding="utf-8-sig")
