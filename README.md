@@ -1,7 +1,7 @@
 # AI Marketing Mix Optimizer (AMMO)
 
 ## 🎯 프로젝트 목표
-> 광고 채널별 ROI 분석 및 LLM 기반 최적 예산 배분 추천 시스템 개발
+광고 채널별 ROI 분석 및 LLM 기반 최적 예산 배분 추천 시스템 개발
 
 ---
 ## 🏷️ 개요
@@ -18,7 +18,7 @@
 
 ---
 ## 🧩 시스템 구조도
-<img width="1171" height="691" alt="그림1" src="https://github.com/user-attachments/assets/0c7dc721-91d4-4550-b762-fb5dcce87a5a" />
+<img width="585" height="345" alt="그림1" src="https://github.com/user-attachments/assets/0c7dc721-91d4-4550-b762-fb5dcce87a5a" />
 
 ---
 ## 💡 기대효과
