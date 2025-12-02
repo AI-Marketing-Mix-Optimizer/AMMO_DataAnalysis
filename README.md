@@ -12,8 +12,8 @@
 
 ---
 ### 🛠️ 주요 적용 기술
-개발언어 : Python, JavaScript
-개발도구 : VS Code, PyCharm, Conda, GitHub
+개발언어 : Python, JavaScript  
+개발도구 : VS Code, PyCharm, Conda, GitHub  
 기술스택 : Selenium, Playwright, Scikit-learn, GPT-4o
 
 ---
