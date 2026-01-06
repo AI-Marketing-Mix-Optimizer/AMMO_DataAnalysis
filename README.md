@@ -34,12 +34,13 @@
   - cpc 추정 : 네이버 검색광고 플랫폼에서 확인할 수 있는 키워드 별 예상 cpc 사용
 
 - 검색광고 광고비 추정
-  - 절대 검색량 x cpc
-
+```
+절대 검색량 x cpc
+```
 
 - 쇼핑라이브 광고비 추정
 ```
-**live_ad_spend = price x fee_rate x (1 + log(1 + purchase_count) / k )**
+live_ad_spend = price x fee_rate x (1 + log(1 + purchase_count) / k )
 ```
 
   - price : 해당 쇼핑라이브에서 판매한 상품들의 평균 가격
