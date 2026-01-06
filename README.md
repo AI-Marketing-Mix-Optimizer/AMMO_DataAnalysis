@@ -25,27 +25,29 @@
 <img width="585" height="345" alt="그림1" src="https://github.com/user-attachments/assets/0c7dc721-91d4-4550-b762-fb5dcce87a5a" />
 
 ---
-## 추정 방법
-[ 검색량 추정 ]
+## 🧮 Proxy 매출·광고비 산출 로직
+- 검색량 추정
 네이버 데이터랩 : 전체 기간의 검색량 확인 가능. but 기간 내 최대 검색량을 100으로 뒀을 때의 상대값임
+
 네이버 검색광고 플랫폼 : 실제 검색량, 예상 cpc 확인 가능. but 최근 한달 것만 확인 가능
 
 절대 검색량 추청 : 데이터랩 검색량을 최근 한달 것만 합산 후 검색광고 플랫폼 검색량과 비교. 단순 비례 방법 사용.
+
 cpc 추정 : 네이버 검색광고 플랫폼에서 확인할 수 있는 키워드 별 예상 cpc 사용
 
-[ 검색광고 광고비 추정 ]
+- 검색광고 광고비 추정
 절대 검색량 x cpc
 
-[ 쇼핑라이브 광고비 추정 ]
-live_ad_spend = price x fee_rate x (1 + log(1 + purchase_count) / k )
+- 쇼핑라이브 광고비 추정
+**live_ad_spend = price x fee_rate x (1 + log(1 + purchase_count) / k )**
 
 price : 해당 쇼핑라이브에서 판매한 상품들의 평균 가격
 fee_rate : 수수료. 네이버 쇼핑라이브 고객센터에 공시된 수수료 기준에 따름.
 purchase_count : 시청자수 x cvr(구매전환율). cvr=0.1%로 설정
 k : 스케일링 상수. k=30으로 설정
 
-[ 매출액 추정 ]
-proxy_sales = search_volume + review_count + avg_rating + live_duration + live_viewers + promotion_flag
+- 매출액 추정
+**proxy_sales = search_volume + review_count + avg_rating + live_duration + live_viewers + promotion_flag**
 
 search_volume : 검색량
 review_count : 해당 날짜의 리뷰 수
@@ -57,7 +59,7 @@ promotion_flag : 쇼핑라이브 프로모션 여부 (0/1)
 2024년 비에날씬 매출액이 2688억 원인 것을 이용. 단순 비례 방식으로 전체 날짜 매출액 추정.
 
 ---
-## 화면 예시
+## 🔎 화면 예시
 <img width="1910" height="937" alt="스크린샷 2026-01-06 213311" src="https://github.com/user-attachments/assets/9dd6a386-4b43-4daa-89a4-ec9fdd73a3c3" />
 
 <img width="1884" height="937" alt="스크린샷 2026-01-06 213518" src="https://github.com/user-attachments/assets/22cce23e-e5e0-43af-af7c-9f84d8d73959" />
