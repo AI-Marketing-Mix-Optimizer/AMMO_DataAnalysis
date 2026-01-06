@@ -38,8 +38,9 @@
 
 
 - 쇼핑라이브 광고비 추정
-
+```
 **live_ad_spend = price x fee_rate x (1 + log(1 + purchase_count) / k )**
+```
 
   - price : 해당 쇼핑라이브에서 판매한 상품들의 평균 가격
   - fee_rate : 네이버 쇼핑라이브 고객센터에 공시된 수수료
@@ -48,8 +49,9 @@
 
 
 - 매출액 추정
-
-**proxy_sales = search_volume + review_count + avg_rating + live_duration + live_viewers + promotion_flag**
+```
+proxy_sales = search_volume + review_count + avg_rating + live_duration + live_viewers + promotion_flag
+```
 
   - search_volume : 검색량
   - review_count : 해당 날짜의 리뷰 수
